@@ -10,7 +10,7 @@ const app = createApp({
             topic: null,
             message: null,
             ws_address: localStorage.getItem('ws_address') || 'ws://localhost:9090',
-            voiceOn: false,
+            voiceOn: true,
             voiceTopic: null,
             voiceRos: null
         };
@@ -21,6 +21,7 @@ const app = createApp({
                 url: this.ws_address
             });
             this.setTopic();
+            this.subscribeToCamera();
 
             this.ros.on('connection', () => {
                 this.connected = true;
@@ -110,19 +111,36 @@ const app = createApp({
             this.voiceTopic = new ROSLIB.Topic({
                 ros: this.ros,
                 name: '/voiceTopic',
-                messageType: 'String'
+                messageType: 'std_msgs/String'
             });
-
-            this.ros.on('connection', () => {
-                this.connected = true;
-                this.logs.unshift('Connected to Voice topic.');
-                this.saveState();
-            });
-            voiceMesg = "on";
+            this.voiceOn = false
+            this.logs.unshift('Connected to Voice topic.');
+            const voiceMesg = {
+                data: "on"  // Định dạng lại tin nhắn theo kiểu JSON để bao gồm trường "data"
+            };
             this.voiceTopic.publish(voiceMesg);
         },
         offVoice() {
-
+            const voiceMesg = {
+                data: "off"  // Định dạng lại tin nhắn theo kiểu JSON để bao gồm trường "data"
+            };
+            this.voiceOn = true
+            this.logs.unshift('Turn off Voice topic.');
+            this.voiceTopic.publish(voiceMesg);
+        },
+        subscribeToCamera() {
+            const imageTopic = new ROSLIB.Topic({
+                ros: this.ros,
+                name: '/camera/image_raw/compressed', // Tên topic mà camera phát
+                messageType: 'sensor_msgs/msg/CompressedImage'
+            });
+            this.logs.unshift('UpdateCamera.');
+            imageTopic.subscribe((message) => {
+                const img = new Image();
+                img.src = 'data:image/jpeg;base64,' + message.data; // Chuyển đổi dữ liệu thành base64
+                document.getElementById('camera-view').innerHTML = ''; // Xóa nội dung cũ
+                document.getElementById('camera-view').appendChild(img); // Thêm hình ảnh mới
+            });
         }
     }
 })

@@ -1,10 +1,28 @@
-<h3>Nhận diện khuôn mặt</h3>
-<!-- Nội dung cho tab nhận diện khuôn mặt -->
-<p>Chức năng nhận diện khuôn mặt sẽ được triển khai ở đây.</p> 
-<p>Chức năng nhận diện khuôn mặt sẽ được triển khai ở đây.</p> 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Recognition</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+</head>
+<body>
+    <div class="container">
+        <h3>Nhận diện khuôn mặt</h3>
+        
+        <!-- Nút nhấn để lưu và upload khuôn mặt -->
+        <button class="btn btn-info" id="show-saved-faces">Các khuôn mặt đã lưu</button>
+        <button class="btn btn-success" id="upload-new-face">Upload khuôn mặt mới</button>
 
-<p>Chức năng nhận diện khuôn mặt sẽ được triển khai ở đây.</p> 
-
-<p>Chức năng nhận diện khuôn mặt sẽ được triển khai ở đây.</p> 
-
-<p>Chức năng nhận diện khuôn mặt sẽ được triển khai ở đây.</p> 
+        <!-- Hai div song song để hiển thị hình ảnh streaming -->
+        <div class="row" style="margin-top: 20px;">
+            <div class="col">
+                <h4>Camera Stream 1</h4>
+                <div id="camera-view-1" style="border: 1px solid #ccc; width: 300px; height: 300px;">
+                    <!-- Hình ảnh camera 1 sẽ được hiển thị ở đây -->
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

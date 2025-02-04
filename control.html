@@ -25,8 +25,8 @@
                 <input type="text" v-model="ws_address"/>
                 <br />
                 <br />
-                <button @click="onVoice" :disabled="loading || !connected" class="btn btn-success " v-if="voiceOn">Voice Command</button>
-                <button @click="offVoice" :disabled="loading || !connected" class="btn btn-danger " v-if="!voiceOn">Voice Command</button>
+                <button @click="onVoice" :disabled="loading || !connected" class="btn btn-success " v-if="voiceOn">Voice On</button>
+                <button @click="offVoice" :disabled="loading || !connected" class="btn btn-danger " v-if="!voiceOn">Voice Off</button>
                 <hr>
                 <h5>Commands</h5>
                 <div class="d-flex justify-content-center mb-3">

@@ -1,3 +1,33 @@
-<h3>Nhận diện cử chỉ tay</h3>
-<!-- Nội dung cho tab nhận diện cử chỉ tay -->
-<p>Chức năng nhận diện cử chỉ tay sẽ được triển khai ở đây.</p> 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gesture Recognition</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+</head>
+<body>
+    <div class="container">
+        <h3>Nhận diện cử chỉ tay</h3>
+        
+        <!-- Nút nhấn Start -->
+        <button class="btn btn-primary" id="start">Start</button>
+
+        <!-- Hai div song song để hiển thị hình ảnh và kết quả -->
+        <div class="row" style="margin-top: 20px;">
+            <div class="col">
+                <h4>Hình ảnh từ camera</h4>
+                <div id="camera-view" style="border: 1px solid #ccc; width: 300px; height: 300px;">
+                    <!-- Hình ảnh camera sẽ được hiển thị ở đây -->
+                </div>
+            </div>
+            <div class="col">
+                <h4>Kết quả nhận diện</h4>
+                <div id="recognition-results" style="border: 1px solid #ccc; width: 300px; height: 300px;">
+                    <!-- Kết quả nhận diện sẽ được hiển thị ở đây -->
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

@@ -72,11 +72,11 @@
 
             document.addEventListener('DOMContentLoaded', function() {
                 // Kiểm tra trạng thái kết nối từ localStorage
-                const startVar = JSON.parse(localStorage.getItem('startVar')) || false;
-                if (!startVar) {
-                    window.location.href = 'startPage.html';
-                    return;
-                }
+                // const startVar = JSON.parse(localStorage.getItem('startVar')) || false;
+                // if (!startVar) {
+                //     window.location.href = 'startPage.html';
+                //     return;
+                // }
 
                 // Tải nội dung các tab từ tabs.html
                 fetch('tabs.html')
