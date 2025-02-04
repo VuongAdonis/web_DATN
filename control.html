@@ -27,8 +27,6 @@
                 <br />
                 <button @click="onVoice" :disabled="loading || !connected" class="btn btn-success " v-if="voiceOn">Voice Command</button>
                 <button @click="offVoice" :disabled="loading || !connected" class="btn btn-danger " v-if="!voiceOn">Voice Command</button>
-                <button @click="onCam" :disabled="loading || !connected" class="btn btn-success " v-if="camOn">Open Camera</button>
-                <button @click="offCam" :disabled="loading || !connected" class="btn btn-danger " v-if="!camOn">Close Camera</button>
                 <hr>
                 <h5>Commands</h5>
                 <div class="d-flex justify-content-center mb-3">

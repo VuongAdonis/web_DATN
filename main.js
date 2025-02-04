@@ -11,7 +11,8 @@ const app = createApp({
             message: null,
             ws_address: localStorage.getItem('ws_address') || 'ws://localhost:9090',
             voiceOn: false,
-            camOn: false
+            voiceTopic: null,
+            voiceRos: null
         };
     },
     methods: {
@@ -106,16 +107,22 @@ const app = createApp({
             this.logs.unshift('Command move backward.');
         },
         onVoice() {
+            this.voiceTopic = new ROSLIB.Topic({
+                ros: this.ros,
+                name: '/voiceTopic',
+                messageType: 'String'
+            });
 
+            this.ros.on('connection', () => {
+                this.connected = true;
+                this.logs.unshift('Connected to Voice topic.');
+                this.saveState();
+            });
+            voiceMesg = "on";
+            this.voiceTopic.publish(voiceMesg);
         },
         offVoice() {
 
-        },
-        onCam() {
-
-        },
-        offCam() {
-          
         }
     }
 })

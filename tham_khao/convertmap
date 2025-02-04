@@ -3,6 +3,44 @@ from rclpy.node import Node
 from nav_msgs.msg import OccupancyGrid
 from std_msgs.msg import String  # Thông điệp kiểu String để xuất bản JSON
 import json
+import array as arr
+
+def occupancy_grid_to_dict(occupancy_grid_msg):
+    # Tạo một biểu diễn từ điển của thông điệp OccupancyGrid
+    map_dict = {
+        'header': {
+            'stamp': {
+                'secs': occupancy_grid_msg.header.stamp.sec,
+                'nsecs': occupancy_grid_msg.header.stamp.nanosec
+            },
+            'frame_id': occupancy_grid_msg.header.frame_id
+        },
+        'info': {
+            'map_load_time': {
+                'secs': occupancy_grid_msg.info.map_load_time.sec,
+                'nsecs': occupancy_grid_msg.info.map_load_time.nanosec
+            },
+            'resolution': occupancy_grid_msg.info.resolution,
+            'width': occupancy_grid_msg.info.width,
+            'height': occupancy_grid_msg.info.height,
+            'origin': {
+                'position': {
+                    'x': occupancy_grid_msg.info.origin.position.x,
+                    'y': occupancy_grid_msg.info.origin.position.y,
+                    'z': occupancy_grid_msg.info.origin.position.z
+                },
+                'orientation': {
+                    'x': occupancy_grid_msg.info.origin.orientation.x,
+                    'y': occupancy_grid_msg.info.origin.orientation.y,
+                    'z': occupancy_grid_msg.info.origin.orientation.z,
+                    'w': occupancy_grid_msg.info.origin.orientation.w
+                }
+            }
+        },
+        'data': occupancy_grid_msg.data.tolist()  # Bao gồm trực tiếp dữ liệu chiếm dụng
+    }
+    
+    return map_dict
 
 class MapToJsonNode(Node):
     def __init__(self):
@@ -18,51 +56,25 @@ class MapToJsonNode(Node):
         self.get_logger().info('Đang lắng nghe topic: /map và gửi JSON đến topic: /map_json')
 
     def listener_callback(self, msg):
-        # Chuyển đổi thông điệp thành từ điển
-        map_dict = {
-            'header': {
-                'seq': msg.header.seq,
-                'stamp': {
-                    'secs': msg.header.stamp.sec,
-                    'nsecs': msg.header.stamp.nanosec
-                },
-                'frame_id': msg.header.frame_id
-            },
-            'info': {
-                'map_load_time': {
-                    'secs': msg.info.map_load_time.sec,
-                    'nsecs': msg.info.map_load_time.nanosec
-                },
-                'resolution': msg.info.resolution,
-                'width': msg.info.width,
-                'height': msg.info.height,
-                'origin': {
-                    'position': {
-                        'x': msg.info.origin.position.x,
-                        'y': msg.info.origin.position.y,
-                        'z': msg.info.origin.position.z
-                    },
-                    'orientation': {
-                        'x': msg.info.origin.orientation.x,
-                        'y': msg.info.origin.orientation.y,
-                        'z': msg.info.origin.orientation.z,
-                        'w': msg.info.origin.orientation.w
-                    }
-                }
-            },
-            'data': msg.data  # Dữ liệu bản đồ
-        }
 
         # Chuyển đổi từ điển thành chuỗi JSON
-        json_data = json.dumps(map_dict)
-
-        # Hiển thị trong log
-        self.get_logger().info(f'Dữ liệu JSON: {json_data}')
+        # json_data = json.dumps(map_dict)
+        list_data = msg.data.tolist()
         
         # Xuất bản dữ liệu JSON lên topic 'map_json'
-        json_msg = String()
-        json_msg.data = json_data
-        self.publisher.publish(json_msg)
+        occupancy_grid_msg = OccupancyGrid()
+        occupancy_grid_msg.header = msg.header
+        occupancy_grid_msg.info = msg.info
+        occupancy_grid_msg.data = list_data
+        de_to_json = occupancy_grid_to_dict(occupancy_grid_msg)
+
+        # json_test = json.dumps(msg.header)
+        print("Success1")
+
+        json_output = json.dumps(de_to_json)
+        publish_msg = String()
+        publish_msg.data = json_output
+        self.publisher.publish(publish_msg)
 
 def main(args=None):
     rclpy.init(args=args)
