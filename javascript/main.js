@@ -12,7 +12,14 @@ const app = createApp({
             ws_address: localStorage.getItem('ws_address') || 'ws://localhost:9090',
             voiceOn: true,
             voiceTopic: null,
-            voiceRos: null
+            voiceRos: null,
+            showFaceOptions: false,
+            showColorOptions: false,
+            showGestureResult: false,
+            gestureResult: '',
+            selectedColorOption: '',
+            activeFeature: false,
+            activeTracking: false
         };
     },
     methods: {
@@ -141,6 +148,86 @@ const app = createApp({
                 document.getElementById('camera-view').innerHTML = ''; // Xóa nội dung cũ
                 document.getElementById('camera-view').appendChild(img); // Thêm hình ảnh mới
             });
+        },
+        toggleFaceOptions() {
+            this.showFaceOptions = !this.showFaceOptions;
+
+        },
+        saved() {
+
+        },
+        add() {
+
+        },
+        toggleColorOptions() {
+            this.showColorOptions = !this.showColorOptions;
+
+        },
+        pickColor() {
+
+        },
+        hsv() {
+
+        },
+        tracking() {
+            this.activeTracking = !this.activeTracking;
+        },
+        gesture() {
+            this.showGestureResult = ! this.showGestureResult;
+        },
+        onColorChange() {
+            // This function gets called whenever a radio button is selected.
+            console.log(this.selectedColorOption); // Log the selected option
+            // You can add additional logic here based on the selected option
+            if (this.selectedColorOption === 'Pick Color') {
+                // Call function for Pick Color
+                this.handlePickColor();
+            } else if (this.selectedColorOption === 'HSV') {
+                // Call function for HSV
+                this.handleHSV();
+            }
+        },
+        handlePickColor() {
+            // Logic for handling Pick Color
+            console.log("Pick Color selected");
+            // Add your code for handling the "Pick Color" action
+        },
+        handleHSV() {
+            // Logic for handling HSV
+            console.log("HSV selected");
+            // Add your code for handling the "HSV" action
+        },
+        activate(feature) {
+            // Set the active feature and toggle options based on the feature activated
+            if (this.activeFeature === feature) {
+                this.activeFeature = '';
+                this.showFaceOptions = false;
+                this.showColorOptions = false;
+                this.showGestureResult = false;
+                return;
+            }
+            this.activeFeature = feature;
+
+            // Toggle Face Options
+            if (feature === 'face') {
+                this.showFaceOptions = !this.showFaceOptions;
+                this.showColorOptions = false; // Hide Color options
+                this.activeTracking = false;
+                this.showGestureResult = false;
+            } 
+            // Toggle Color Options
+            else if (feature === 'color') {
+                this.showColorOptions = !this.showColorOptions;
+                this.showFaceOptions = false; // Hide Face options
+                this.showGestureResult = false;
+            } 
+            // If Gesture is clicked, ensure other options are closed
+            else {
+                this.showFaceOptions = false; // Hide Face options
+                this.showColorOptions = false; // Hide Color options
+                this.activeTracking = false;
+                this.gesture();
+            }
         }
     }
 })

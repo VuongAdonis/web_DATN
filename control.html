@@ -15,49 +15,103 @@
         <h3>Control Panel</h3>
         <button @click="connect" class="btn btn-success" v-if="!connected">Connect Topic</button>
         <button @click="disconnect" class="btn btn-danger" v-if="connected">Disconnect Topic</button>
-        <!-- Nội dung của tab điều khiển -->
+    
         <div class="row">
             <div class="col-md-5" style="margin-right: 20px;">
                 <h3>Connection status</h3>
                 <p class="text-success" v-if="connected">Connected!</p>
                 <p class="text-danger" v-if="!connected">Not connected!</p>
                 <label>Websocket server address</label>
-                <input type="text" v-model="ws_address"/>
-                <br />
-                <br />
-                <button @click="onVoice" :disabled="loading || !connected" class="btn btn-success " v-if="voiceOn">Voice On</button>
-                <button @click="offVoice" :disabled="loading || !connected" class="btn btn-danger " v-if="!voiceOn">Voice Off</button>
+                <input type="text" v-model="ws_address" class="form-control mb-3"/>
+    
+                <button @click="onVoice" :disabled="loading || !connected" class="btn btn-success" v-if="voiceOn">Voice On</button>
+                <button @click="offVoice" :disabled="loading || !connected" class="btn btn-danger" v-if="!voiceOn">Voice Off</button>
+    
                 <hr>
                 <h5>Commands</h5>
+    
                 <div class="d-flex justify-content-center mb-3">
                     <button @click="forward" :disabled="loading || !connected" class="btn btn-primary">Go forward</button>
                 </div>
+    
                 <div class="d-flex justify-content-between mb-3">
                     <button @click="turnLeft" :disabled="loading || !connected" class="btn btn-primary">Turn left</button>
                     <button @click="stop" :disabled="loading || !connected" class="btn btn-danger">Stop</button>
                     <button @click="turnRight" :disabled="loading || !connected" class="btn btn-primary">Turn right</button>
                 </div>
-                <div class="text-center">
+    
+                <div class="text-center mb-3">
                     <button @click="backward" :disabled="loading || !connected" class="btn btn-primary">Go backward</button>
                 </div>
+    
+                <!-- New buttons vertically aligned -->
+                <div class="mt-4">
+                    <!-- Face Button Group -->
+                    <div class="mb-2">
+                        <button @click="activate('face')" 
+                                :class="{'btn-success': activeFeature === 'face', 'btn-secondary': activeFeature !== 'face'}" 
+                                class="btn w-100 mt-2">Face</button>
+                
+                        <div v-if="showFaceOptions" class="ml-2">
+                            <button @click="saved" 
+                                    :class="{'btn-success': activeFeature === 'saved', 'btn-outline-primary': activeFeature !== 'saved'}" 
+                                    class="btn w-100 mt-2">Saved</button>
+                
+                            <button @click="add" 
+                                    :class="{'btn-success': activeFeature === 'add', 'btn-outline-primary': activeFeature !== 'add'}" 
+                                    class="btn w-100 mt-2">Add</button>
+                        </div>
+                    </div>
+                
+                    <!-- Color Button Group -->
+                    <div class="mb-2">
+                        <button @click="activate('color')" 
+                                :class="{'btn-success': activeFeature === 'color', 'btn-secondary': activeFeature !== 'color'}" 
+                                class="btn w-100 mt-2">Color</button>
+                
+                        <div v-if="showColorOptions" class="ml-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="colorOption" id="pickColor" 
+                                       value="Pick Color" v-model="selectedColorOption" @change="onColorChange">
+                                <label class="form-check-label" for="pickColor">Pick Color</label>
+                            </div>
+                
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="colorOption" id="hsv" 
+                                       value="HSV" v-model="selectedColorOption" @change="onColorChange">
+                                <label class="form-check-label" for="hsv">HSV</label>
+                            </div>
+                
+                            <button @click="tracking" 
+                                    :class="{'btn-success': activeTracking, 'btn-outline-secondary': !activeTracking}" 
+                                    class="btn w-100 mt-2">Tracking</button>
+                        </div>
+                    </div>
+                
+                    <!-- Gesture Button -->
+                    <div>
+                        <button @click="activate('gesture')" 
+                                :class="{'btn-success': activeFeature === 'gesture', 'btn-secondary': activeFeature !== 'gesture'}" 
+                                class="btn w-100 mt-2">Gesture</button>
+                        
+                        <div v-if="showGestureResult" class="mt-2 alert alert-info">Results: {{ gestureResult }}</div>
+                    </div>
+                </div>
             </div>
-
-            <!-- Phần hiển thị camera và log messages bên phải -->
+    
+            <!-- Log messages and Camera View -->
             <div class="col-md-5">
                 <h3>Log messages</h3>
                 <div style="border: 1px solid #ccc; padding: 10px; height: 150px; overflow-y: auto; margin-bottom: 20px;">
-                    <p v-for="log in logs">
-                        {{ log }}
-                    </p>
+                    <p v-for="log in logs">{{ log }}</p>
                 </div>
                 <h3>Camera View</h3>
-                <div id="camera-view" style="border: 1px solid #ccc; height: 400px; margin-bottom: 20px;">
-                </div>
+                <div id="camera-view" style="border: 1px solid #ccc; height: 400px; margin-bottom: 20px;"></div>
             </div>
         </div>
     </div>
     
-    <script type="text/javascript" src="main.js">
+    <script type="text/javascript" src="javascript/main.js">
     </script>
 
 </body>
