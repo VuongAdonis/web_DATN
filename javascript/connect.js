@@ -36,7 +36,7 @@ function initializeConnection() {
                 //     });
                 this.connected = false;
                 this.startVar = true;
-                this.logs.unshift('Connected to websocket server.');
+                // this.logs.unshift('Connected to websocket server.');
                 this.saveState();
                 window.location.href = 'index.html';
 
@@ -62,11 +62,11 @@ function initializeConnection() {
                 // }
             },
             saveState() {
-                localStorage.setItem('connected', JSON.stringify(this.connected));
-                localStorage.setItem('ws_address', this.ws_address);
-                localStorage.setItem('logs', JSON.stringify(this.logs));
-                localStorage.setItem('ros', JSON.stringify(this.ros));
-                localStorage.setItem('startVar', JSON.stringify(this.startVar));
+                // localStorage.setItem('connected', JSON.stringify(this.connected));
+                // localStorage.setItem('ws_address', this.ws_address);
+                // localStorage.setItem('logs', JSON.stringify(this.logs));
+                // localStorage.setItem('ros', JSON.stringify(this.ros));
+                // localStorage.setItem('startVar', JSON.stringify(this.startVar));
             }
         }
     });

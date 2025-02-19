@@ -11,7 +11,19 @@ const app = createApp({
             message: null,
             ws_address: localStorage.getItem('ws_address') || 'ws://localhost:9090',
             voiceOn: true,
+
             voiceTopic: null,
+            featureTopic: null,
+            batteryTopic: null,
+            imageTopic: null,
+
+            voiceActive: false,
+            faceAtive: false,
+            gestureActive: false,
+            colorActive: false,
+            trackingActive: false,
+            selectedColor: "green",
+
             voiceRos: null,
             showFaceOptions: false,
             showColorOptions: false,
@@ -19,7 +31,8 @@ const app = createApp({
             gestureResult: '',
             selectedColorOption: '',
             activeFeature: false,
-            activeTracking: false
+            activeTracking: false,
+            batteryLevel: '--'
         };
     },
     methods: {
@@ -27,6 +40,8 @@ const app = createApp({
             this.ros = new ROSLIB.Ros({
                 url: this.ws_address
             });
+            
+            console.log("ros attribute: ", this.ros)
             this.setTopic();
             this.subscribeToCamera();
 
@@ -46,6 +61,7 @@ const app = createApp({
                 this.connected = false;
                 this.logs.unshift('Connection to websocket server closed.');
                 this.saveState();
+                this.disconnect()
             });
         },
         disconnect() {
@@ -58,15 +74,42 @@ const app = createApp({
             }
         },
         saveState() {
-            localStorage.setItem('connected', JSON.stringify(this.connected));
-            localStorage.setItem('ws_address', this.ws_address);
+            // localStorage.setItem('connected', JSON.stringify(this.connected));
+            // localStorage.setItem('ws_address', this.ws_address);
             localStorage.setItem('logs', JSON.stringify(this.logs));
+            // localStorage.setItem('ros', JSON.stringify(this.ros));
         },
         setTopic() {
             this.topic = new ROSLIB.Topic({
                 ros: this.ros,
                 name: '/cmd_vel',
                 messageType: 'geometry_msgs/Twist'
+            });
+
+            this.featureTopic = new ROSLIB.Topic({
+                ros: this.ros,
+                name: '/featureTopic',
+                messageType: 'std_msgs/String'
+            });
+            this.colorTopic = new ROSLIB.Topic({
+                ros: this.ros,
+                name: 'colorChoice', // Tên topic mà camera phát
+                messageType: 'std_msgs/String'
+            });
+            this.voiceTopic = new ROSLIB.Topic({
+                ros: this.ros,
+                name: '/voiceTopic',
+                messageType: 'std_msgs/String'
+            });
+            this.imageTopic = new ROSLIB.Topic({
+                ros: this.ros,
+                name: '/camera/image_raw/compressed', // Tên topic mà camera phát
+                messageType: 'sensor_msgs/msg/CompressedImage'
+            });
+            this.batteryTopic = new ROSLIB.Topic({
+                ros: this.ros,
+                name: 'batteryTopic', // Tên topic mà camera phát
+                messageType: 'std_msgs/String'
             });
         },
         forward() {
@@ -115,11 +158,6 @@ const app = createApp({
             this.logs.unshift('Command move backward.');
         },
         onVoice() {
-            this.voiceTopic = new ROSLIB.Topic({
-                ros: this.ros,
-                name: '/voiceTopic',
-                messageType: 'std_msgs/String'
-            });
             this.voiceOn = false
             this.logs.unshift('Connected to Voice topic.');
             const voiceMesg = {
@@ -136,31 +174,26 @@ const app = createApp({
             this.voiceTopic.publish(voiceMesg);
         },
         subscribeToCamera() {
-            const imageTopic = new ROSLIB.Topic({
-                ros: this.ros,
-                name: '/camera/image_raw/compressed', // Tên topic mà camera phát
-                messageType: 'sensor_msgs/msg/CompressedImage'
-            });
+            
             this.logs.unshift('UpdateCamera.');
-            imageTopic.subscribe((message) => {
+            this.imageTopic.subscribe((message) => {
                 const img = new Image();
                 img.src = 'data:image/jpeg;base64,' + message.data; // Chuyển đổi dữ liệu thành base64
                 document.getElementById('camera-view').innerHTML = ''; // Xóa nội dung cũ
                 document.getElementById('camera-view').appendChild(img); // Thêm hình ảnh mới
             });
         },
-        toggleFaceOptions() {
-            this.showFaceOptions = !this.showFaceOptions;
-
+        subscribeToBattery() {
+            
+            this.logs.unshift('Update Battery.');
+            this.batteryTopic.subscribe((message) => {
+                this.batteryLevel = message.data;
+            });
         },
         saved() {
 
         },
         add() {
-
-        },
-        toggleColorOptions() {
-            this.showColorOptions = !this.showColorOptions;
 
         },
         pickColor() {
@@ -170,7 +203,23 @@ const app = createApp({
 
         },
         tracking() {
-            this.activeTracking = !this.activeTracking;
+            // this.activeTracking = !this.activeTracking;
+            if( this.activeTracking === false ) {
+                this.logs.unshift('Tracking color.');
+                const trackingMesg = {
+                    data: "tracking"  // Định dạng lại tin nhắn theo kiểu JSON để bao gồm trường "data"
+                };
+                this.colorTopic.publish(trackingMesg);
+                this.activeTracking = true
+            }
+            else{
+                this.logs.unshift('Stop tracking.');
+                const trackingMesg = {
+                    data: "untracking"  // Định dạng lại tin nhắn theo kiểu JSON để bao gồm trường "data"
+                };
+                this.colorTopic.publish(trackingMesg);
+                this.activeTracking = false
+            }
         },
         gesture() {
             this.showGestureResult = ! this.showGestureResult;
@@ -181,21 +230,38 @@ const app = createApp({
             // You can add additional logic here based on the selected option
             if (this.selectedColorOption === 'Pick Color') {
                 // Call function for Pick Color
-                this.handlePickColor();
+                console.log("Pick Color selected");
+                // this.handlePickColor();
             } else if (this.selectedColorOption === 'HSV') {
                 // Call function for HSV
                 this.handleHSV();
             }
+
         },
         handlePickColor() {
             // Logic for handling Pick Color
-            console.log("Pick Color selected");
-            // Add your code for handling the "Pick Color" action
+            // console.log("Pick Color selected");
+            this.logs.unshift('Choose ' + this.selectedColor + " color");
+            const colorMesg = {
+                data: this.selectedColor  // Định dạng lại tin nhắn theo kiểu JSON để bao gồm trường "data"
+            };
+            this.colorTopic.publish(colorMesg)
         },
         handleHSV() {
             // Logic for handling HSV
             console.log("HSV selected");
             // Add your code for handling the "HSV" action
+        },
+        sendFeatureMsg(feature) {
+            this.logs.unshift('Connected to ' + feature + ' topic.');
+            const featureMsg = {
+                data: feature  // Định dạng lại tin nhắn theo kiểu JSON để bao gồm trường "data"
+            };
+            console.log('feature: ' + feature);
+            if (feature !== ''){
+                this.featureTopic.publish(featureMsg);
+            }
+            
         },
         activate(feature) {
             // Set the active feature and toggle options based on the feature activated
@@ -204,6 +270,7 @@ const app = createApp({
                 this.showFaceOptions = false;
                 this.showColorOptions = false;
                 this.showGestureResult = false;
+                this.sendFeatureMsg("offFeature");
                 return;
             }
             this.activeFeature = feature;
@@ -214,12 +281,14 @@ const app = createApp({
                 this.showColorOptions = false; // Hide Color options
                 this.activeTracking = false;
                 this.showGestureResult = false;
+                this.sendFeatureMsg(feature);
             } 
             // Toggle Color Options
             else if (feature === 'color') {
                 this.showColorOptions = !this.showColorOptions;
                 this.showFaceOptions = false; // Hide Face options
                 this.showGestureResult = false;
+                this.sendFeatureMsg(feature);
             } 
             // If Gesture is clicked, ensure other options are closed
             else {
@@ -227,6 +296,7 @@ const app = createApp({
                 this.showColorOptions = false; // Hide Color options
                 this.activeTracking = false;
                 this.gesture();
+                this.sendFeatureMsg(feature);
             }
         }
     }

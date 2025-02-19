@@ -21,6 +21,9 @@
                 <h3>Connection status</h3>
                 <p class="text-success" v-if="connected">Connected!</p>
                 <p class="text-danger" v-if="!connected">Not connected!</p>
+                <!-- Battery percentage display -->
+                <p>Battery: {{ batteryLevel }}%</p> 
+
                 <label>Websocket server address</label>
                 <input type="text" v-model="ws_address" class="form-control mb-3"/>
     
@@ -74,6 +77,26 @@
                                 <input class="form-check-input" type="radio" name="colorOption" id="pickColor" 
                                        value="Pick Color" v-model="selectedColorOption" @change="onColorChange">
                                 <label class="form-check-label" for="pickColor">Pick Color</label>
+                            </div>
+
+                            <div v-if="selectedColorOption === 'Pick Color'" class="ml-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="colorChoice" id="colorGreen"
+                                           value="green" v-model="selectedColor" @change="handlePickColor">
+                                    <label class="form-check-label" for="colorGreen">green</label>
+                                </div>
+                    
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="colorChoice" id="colorRed"
+                                           value="red" v-model="selectedColor" @change="handlePickColor">
+                                    <label class="form-check-label" for="colorRed">red</label>
+                                </div>
+                    
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="colorChoice" id="colorBlue"
+                                           value="blue" v-model="selectedColor" @change="handlePickColor">
+                                    <label class="form-check-label" for="colorBlue">blue</label>
+                                </div>
                             </div>
                 
                             <div class="form-check">
